@@ -56,11 +56,11 @@ mod tests {
     #[test]
     fn test_min_path_sum_youtube() {
         let mut copy = PROBLEM.iter().copied().map(|row| row.to_vec()).collect::<Vec<Vec<i32>>>();
+        assert_eq!(super::min_path_sum_youtube_vec(&mut copy), 7);
         assert_eq!(copy, vec![
             vec![1, 4, 5],
             vec![2, 7, 6],
             vec![6, 8, 7]
         ]);
-        assert_eq!(super::min_path_sum_youtube_vec(&mut copy), 7);
     }
 }
