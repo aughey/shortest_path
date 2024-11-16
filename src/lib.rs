@@ -1,3 +1,4 @@
+/// Straight syntax translation from the youtube video's python solution.
 pub fn min_path_sum_youtube(grid: &mut [&mut [i32]]) -> i32 {
     for i in 0..grid.len() {
         for j in 0..grid[i].len() {
@@ -17,6 +18,7 @@ pub fn min_path_sum_youtube(grid: &mut [&mut [i32]]) -> i32 {
     grid[grid.len() - 1][grid[0].len() - 1]
 }
 
+/// Straight syntax translation from the youtube video's python solution using mutable vectors.
 pub fn min_path_sum_youtube_vec(grid: &mut Vec<Vec<i32>>) -> i32 {
     for i in 0..grid.len() {
         for j in 0..grid[i].len() {
@@ -36,6 +38,7 @@ pub fn min_path_sum_youtube_vec(grid: &mut Vec<Vec<i32>>) -> i32 {
     grid[grid.len() - 1][grid[0].len() - 1]
 }
 
+/// Idiomatic Rust solution using pattern matching.
 pub fn min_path_sum_match(grid: &mut Vec<Vec<i32>>) -> i32 {
     for i in 0..grid.len() {
         for j in 0..grid[i].len() {
@@ -50,14 +53,15 @@ pub fn min_path_sum_match(grid: &mut Vec<Vec<i32>>) -> i32 {
     grid[grid.len() - 1][grid[0].len() - 1]
 }
 
+/// Idiomatic Rust solution using pattern matching with overflow handling.
 pub fn min_path_sum_overflow(grid: &mut Vec<Vec<i32>>) -> Option<i32> {
     for i in 0..grid.len() {
         for j in 0..grid[i].len() {
             grid[i][j] = match (i, j) {
                 (0, 0) => grid[i][j],
-                (0, _) => grid[i][j] + grid[i][j - 1],
-                (_, 0) => grid[i][j] + grid[i - 1][j],
-                _ => grid[i][j] + std::cmp::min(grid[i - 1][j], grid[i][j - 1]),
+                (0, _) => grid[i][j].checked_add(grid[i][j - 1])?,
+                (_, 0) => grid[i][j].checked_add(grid[i - 1][j])?,
+                _ => grid[i][j].checked_add(std::cmp::min(grid[i - 1][j], grid[i][j - 1]))?,
             };
         }
     }
@@ -74,6 +78,8 @@ mod tests {
 
     const ONE_COL: &[&[i32]] = &[&[1], &[1], &[4]];
     const ONE_COL_ANS: i32 = 6;
+
+    const PROBLEM_WITH_OVERFLOW: &[&[i32]] = &[&[1, std::i32::MAX, 1]];
 
     trait MaybeI32 {
         fn maybe(self) -> Option<i32>;
@@ -135,5 +141,26 @@ mod tests {
     #[test]
     fn test_min_path_sum_overflow() {
         test_all(super::min_path_sum_overflow);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_overflow_panics() {
+        let mut copy = PROBLEM_WITH_OVERFLOW
+            .iter()
+            .copied()
+            .map(|row| row.to_vec())
+            .collect::<Vec<Vec<i32>>>();
+        _ = super::min_path_sum_match(&mut copy);
+    }
+
+    #[test]
+    fn test_overflow_correctly_handled() {
+        let mut copy = PROBLEM_WITH_OVERFLOW
+            .iter()
+            .copied()
+            .map(|row| row.to_vec())
+            .collect::<Vec<Vec<i32>>>();
+        assert_eq!(super::min_path_sum_overflow(&mut copy), None);
     }
 }
