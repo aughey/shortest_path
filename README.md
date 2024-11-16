@@ -7,6 +7,8 @@ Rust implementation of this youtube short: https://www.youtube.com/shorts/KQGBl_
 ```
 rustup default stable
 rustup upgrade
+rustup component add rustfmt
+rustup component add rust-analyzer
 ```
 
 # Updating dev ci
