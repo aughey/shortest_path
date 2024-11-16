@@ -66,8 +66,6 @@ pub fn min_path_sum_overflow(grid: &mut Vec<Vec<i32>>) -> Option<i32> {
 
 #[cfg(test)]
 mod tests {
-    use std::panic::PanicHookInfo;
-
     const PROBLEM: &[&[i32]] = &[&[1, 3, 1], &[1, 5, 1], &[4, 2, 1]];
     const PROBLEM_ANS: i32 = 7;
 
@@ -77,6 +75,21 @@ mod tests {
     const ONE_COL: &[&[i32]] = &[&[1], &[1], &[4]];
     const ONE_COL_ANS: i32 = 6;
 
+    trait MaybeI32 {
+        fn maybe(self) -> Option<i32>;
+    }
+
+    impl MaybeI32 for i32 {
+        fn maybe(self) -> Option<i32> {
+            Some(self)
+        }
+    }
+    impl MaybeI32 for Option<i32> {
+        fn maybe(self) -> Option<i32> {
+            self
+        }
+    }
+
     #[test]
     fn problem_validation() {
         assert_eq!(PROBLEM.len(), 3);
@@ -85,25 +98,28 @@ mod tests {
         }
     }
 
-    fn test_all(f: impl Fn(&mut Vec<Vec<i32>>) -> i32) {
+    fn test_all<R>(f: impl Fn(&mut Vec<Vec<i32>>) -> R)
+    where
+        R: MaybeI32,
+    {
         let mut copy = PROBLEM
             .iter()
             .copied()
             .map(|row| row.to_vec())
             .collect::<Vec<Vec<i32>>>();
-        assert_eq!(f(&mut copy), PROBLEM_ANS);
+        assert_eq!(f(&mut copy).maybe(), Some(PROBLEM_ANS));
         let mut copy = ONE_COL
             .iter()
             .copied()
             .map(|row| row.to_vec())
             .collect::<Vec<Vec<i32>>>();
-        assert_eq!(f(&mut copy), ONE_COL_ANS);
+        assert_eq!(f(&mut copy).maybe(), Some(ONE_COL_ANS));
         let mut copy = ONE_ROW
             .iter()
             .copied()
             .map(|row| row.to_vec())
             .collect::<Vec<Vec<i32>>>();
-        assert_eq!(f(&mut copy), ONE_ROW_ANS);
+        assert_eq!(f(&mut copy).maybe(), Some(ONE_ROW_ANS));
     }
 
     #[test]
@@ -113,45 +129,11 @@ mod tests {
 
     #[test]
     fn test_min_path_sum_match() {
-        let mut copy = PROBLEM
-            .iter()
-            .copied()
-            .map(|row| row.to_vec())
-            .collect::<Vec<Vec<i32>>>();
-        assert_eq!(super::min_path_sum_match(&mut copy), PROBLEM_ANS);
-        let mut copy = ONE_COL
-            .iter()
-            .copied()
-            .map(|row| row.to_vec())
-            .collect::<Vec<Vec<i32>>>();
-        assert_eq!(super::min_path_sum_match(&mut copy), ONE_COL_ANS);
-        let mut copy = ONE_ROW
-            .iter()
-            .copied()
-            .map(|row| row.to_vec())
-            .collect::<Vec<Vec<i32>>>();
-        assert_eq!(super::min_path_sum_match(&mut copy), ONE_ROW_ANS);
+        test_all(super::min_path_sum_match);
     }
 
     #[test]
     fn test_min_path_sum_overflow() {
-        let mut copy = PROBLEM
-            .iter()
-            .copied()
-            .map(|row| row.to_vec())
-            .collect::<Vec<Vec<i32>>>();
-        assert_eq!(super::min_path_sum_overflow(&mut copy), Some(PROBLEM_ANS));
-        let mut copy = ONE_COL
-            .iter()
-            .copied()
-            .map(|row| row.to_vec())
-            .collect::<Vec<Vec<i32>>>();
-        assert_eq!(super::min_path_sum_overflow(&mut copy), Some(ONE_COL_ANS));
-        let mut copy = ONE_ROW
-            .iter()
-            .copied()
-            .map(|row| row.to_vec())
-            .collect::<Vec<Vec<i32>>>();
-        assert_eq!(super::min_path_sum_overflow(&mut copy), Some(ONE_ROW_ANS));
+        test_all(super::min_path_sum_overflow);
     }
 }
