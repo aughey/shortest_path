@@ -11,3 +11,6 @@ criterion = { version = "0.5.1", features = ["html_reports"] }
 [[bench]]
 name = "benchmark"
 harness = false
+
+[dependencies]
+itertools = "0.13.0"

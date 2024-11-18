@@ -68,6 +68,21 @@ pub fn min_path_sum_overflow(grid: &mut Vec<Vec<i32>>) -> Option<i32> {
     Some(grid[grid.len() - 1][grid[0].len() - 1])
 }
 
+/// Returns an iterator that will iterate over the grid where each item is the
+/// value above, the value to the left, and the current value.
+pub fn grid_iterator<'a, OUTER, INNER>(
+    grid: OUTER,
+) -> impl Iterator<Item = (Option<i32>, Option<i32>, &'a mut i32)>
+where
+    OUTER: IntoIterator<Item = INNER> + 'a,
+    INNER: AsRef<&'a mut i32>,
+{
+    // First run has no prior row so no above value
+    // return an empty iterator
+    let empty = std::iter::empty();
+    empty
+}
+
 #[cfg(test)]
 mod tests {
     const PROBLEM: &[&[i32]] = &[&[1, 3, 1], &[1, 5, 1], &[4, 2, 1]];
